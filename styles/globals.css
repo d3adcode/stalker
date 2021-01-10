@@ -1,16 +1,15 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+/*.active-row, .rs-table-row .rs-table-cell {
+  background-color: green;
+}*/
+
+/*.active-row, .rs-table-row .rs-table-cell {
+  background-color: green;
+}*/
+
+.active-row .rs-table-row {
+  background-color: green;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
+.active-row .rs-table-cell {
+  background-color: green;
 }

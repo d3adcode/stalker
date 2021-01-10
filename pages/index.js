@@ -1,65 +1,89 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
+import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
+import 'rsuite-table/dist/css/rsuite-table.css'
+import React, { useState } from 'react'
+import { differenceInSeconds } from 'date-fns'
 
-export default function Home() {
+export default React.memo(function Home() {
+  const [data, setData] = useState({
+    tableData: [
+      {
+        id: 0,
+        task: "stalker",
+        last_modified: (new Date()).toISOString(),
+        active: false,
+        current: 0,
+        total: 0
+      }
+    ]
+  })
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Table data={data.tableData} width={700} height={1000}
+           rowClassName={rowData => {
+             let activeRow = rowData && rowData.active ? 'active-row' : ''
+             return rowData && rowData.active ? 'active-row' : ''
+           }}
+           onRowClick={rowData => {
+             let newData = {...data}
+             let newDate = new Date()
+             let newRow = {...rowData}
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+             newRow.last_modified = (new Date()).toISOString()
+             newRow.active = !rowData.active
+             newRow.current = 0
+             newData.tableData[newRow.id] = newRow
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+             if (newRow && newRow.active) {
+               console.log('setting timer...')
+               let timerObj = {id: rowData.id}
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+               let timer = (function() {
+                 let newData = {...data}
+                 let rowData = newData.tableData[this.id]
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+                 if (rowData.active) {
+                   rowData.current++
+                   rowData.total++
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+                   setData(newData)
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
+                   setTimeout(timer,1000)
+                  }
+               }).bind(timerObj)
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
+               setTimeout(timer,1000);
+             }
+
+             setData(newData)
+          }}>
+
+      <Column width={100}>
+        <HeaderCell>ID</HeaderCell>
+        <Cell dataKey="id"/>
+      </Column>
+      <Column width={100}>
+        <HeaderCell>TASK</HeaderCell>
+        <Cell dataKey="task"/>
+      </Column>
+      <Column width={200}>
+        <HeaderCell>LAST_MODIFIED</HeaderCell>
+        <Cell dataKey="last_modified"/>
+      </Column>
+      <Column width={100}>
+        <HeaderCell>ACTIVE</HeaderCell>
+        <Cell dataKey="active"/>
+      </Column>
+      <Column width={100}>
+        <HeaderCell>CURRENT</HeaderCell>
+        <Cell dataKey="current"/>
+      </Column>
+      <Column width={100}>
+        <HeaderCell>TOTAL</HeaderCell>
+        <Cell dataKey="total"/>
+      </Column>
+
+    </Table>
   )
-}
+})
