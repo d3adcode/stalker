@@ -7,7 +7,7 @@ import { differenceInSeconds } from 'date-fns'
 
 export default React.memo(function Home() {
   const [data, setData] = useState({
-    tableData: [
+    tasks: [
       {
         id: 0,
         task: "stalker",
@@ -16,48 +16,62 @@ export default React.memo(function Home() {
         current: 0,
         total: 0
       }
-    ]
+    ],
+    sessions: []
+    /* example session object
+     * {
+     * id: // task id,
+     * date: // ISOString representing date which task session was started or ended,
+     * type: // start or end
+     * }
+     */
   })
 
   return (
-    <Table data={data.tableData} width={700} height={1000}
-           rowClassName={rowData => {
-             let activeRow = rowData && rowData.active ? 'active-row' : ''
-             return rowData && rowData.active ? 'active-row' : ''
-           }}
-           onRowClick={rowData => {
-             let newData = {...data}
-             let newDate = new Date()
-             let newRow = {...rowData}
+    <Table data={data.tasks} width={700} height={1000}
+      rowClassName={row => {
+        return row && row.active ? 'active-row' : ''
+      }}
+      onRowClick={row => {
+        let newData = {...data}
+        let newDate = new Date()
+        let newRow = {...row}
 
-             newRow.last_modified = (new Date()).toISOString()
-             newRow.active = !rowData.active
-             newRow.current = 0
-             newData.tableData[newRow.id] = newRow
+        newRow.last_modified = (new Date()).toISOString()
+        newRow.active = !row.active
+        newRow.current = 0
+        newData.tasks[newRow.id] = newRow
 
-             if (newRow && newRow.active) {
-               console.log('setting timer...')
-               let timerObj = {id: rowData.id}
+        newData.sessions.push({
+          id: row.task,
+          date: newDate.toISOString(),
+          type: row.active ? 'stop' : 'start'
+        })
 
-               let timer = (function() {
-                 let newData = {...data}
-                 let rowData = newData.tableData[this.id]
+        console.log(data.sessions)
 
-                 if (rowData.active) {
-                   rowData.current++
-                   rowData.total++
+        if (newRow && newRow.active) {
+          let timerObj = {id: row.id}
 
-                   setData(newData)
+          let timer = (function() {
+            let newData = {...data}
+            let row = newData.tasks[this.id]
 
-                   setTimeout(timer,1000)
-                  }
-               }).bind(timerObj)
+            if (row.active) {
+              row.current++
+              row.total++
 
-               setTimeout(timer,1000);
+              setData(newData)
+
+              setTimeout(timer,1000)
              }
+          }).bind(timerObj)
 
-             setData(newData)
-          }}>
+          setTimeout(timer,1000);
+        }
+
+        setData(newData)
+      }}>
 
       <Column width={100}>
         <HeaderCell>ID</HeaderCell>
