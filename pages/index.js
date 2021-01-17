@@ -5,26 +5,28 @@ import 'rsuite-table/dist/css/rsuite-table.css'
 import React, { useState } from 'react'
 import { differenceInSeconds } from 'date-fns'
 
+const Task = function (id,task,last_modified,active,current,total) {
+  this.id = id
+  this.task = task
+  this.last_modified = last_modified || (new Date()).toISOString()
+  this.active = active
+  this.current = current
+  this.total = total
+}
+
+const Session = function(task_id,create_date,session_type) {
+  this.task_id = task_id 
+  // ISOString representing date which session was started or ended
+  this.create_date = create_date || (new Date()).toISOString()
+  this.session_type = session_type // start or end
+}
+
 export default React.memo(function Home() {
   const [data, setData] = useState({
     tasks: [
-      {
-        id: 0,
-        task: "stalker",
-        last_modified: (new Date()).toISOString(),
-        active: false,
-        current: 0,
-        total: 0
-      }
+      new Task(0,'stalker',null,false,0,0)
     ],
     sessions: []
-    /* example session object
-     * {
-     * id: // task id,
-     * date: // ISOString representing date which task session was started or ended,
-     * type: // start or end
-     * }
-     */
   })
 
   return (
@@ -32,23 +34,19 @@ export default React.memo(function Home() {
       rowClassName={row => {
         return row && row.active ? 'active-row' : ''
       }}
+
       onRowClick={row => {
         let newData = {...data}
         let newDate = new Date()
         let newRow = {...row}
 
-        newRow.last_modified = (new Date()).toISOString()
-        newRow.active = !row.active
-        newRow.current = 0
+        newRow = new Task(row.id,row.task,null,!row.active,0,row.total)
         newData.tasks[newRow.id] = newRow
 
-        newData.sessions.push({
-          id: row.task,
-          date: newDate.toISOString(),
-          type: row.active ? 'stop' : 'start'
-        })
-
-        console.log(data.sessions)
+        if (newRow.active)
+          newData.sessions.push(new Session(row.id,null,'start'))
+        else
+          newData.sessions.push(new Session(row.id,null,'stop'))
 
         if (newRow && newRow.active) {
           let timerObj = {id: row.id}
@@ -63,10 +61,12 @@ export default React.memo(function Home() {
 
               setData(newData)
 
+              // use setTimeout so we automatically stop timer once the row becomes inactive
               setTimeout(timer,1000)
              }
           }).bind(timerObj)
 
+          // use setTimeout so we automatically stop timer once the row becomes inactive
           setTimeout(timer,1000);
         }
 
