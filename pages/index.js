@@ -4,22 +4,24 @@ import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
 import 'rsuite-table/dist/css/rsuite-table.css'
 import React, { useState } from 'react'
 import { differenceInSeconds } from 'date-fns'
+import Task from '../models/task'
+import Session from '../models/session'
 
-const Task = function (id,task,last_modified,active,current,total) {
+/*const Task = function (id,task,last_modified,active,current,total) {
   this.id = id
   this.task = task
   this.last_modified = last_modified || (new Date()).toISOString()
   this.active = active
   this.current = current
   this.total = total
-}
+}*/
 
-const Session = function(task_id,create_date,session_type) {
+/*const Session = function(task_id,create_date,session_type) {
   this.task_id = task_id 
   // ISOString representing date which session was started or ended
   this.create_date = create_date || (new Date()).toISOString()
   this.session_type = session_type // start or end
-}
+}*/
 
 export default React.memo(function Home() {
   const [data, setData] = useState({
