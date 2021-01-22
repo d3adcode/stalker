@@ -1,8 +1,9 @@
-export default function Task (id,task,last_modified,active,current,total) {
+export default function Task (id,task,last_modified,selected,editing,current,total) {
   this.id = id
   this.task = task
   this.last_modified = last_modified || (new Date()).toISOString()
-  this.active = active
+  this.selected = selected
+  this.editing = editing
   this.current = current
   this.total = total
 
