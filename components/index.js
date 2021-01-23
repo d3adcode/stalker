@@ -8,7 +8,52 @@ import { differenceInSeconds } from 'date-fns'
 import Task from '../models/task'
 import Session from '../models/session'
 import fetch from 'isomorphic-fetch'
-import { ActionCell, EditCell, EditActionCell, StartActionCell } from '../components/stalkerCell'
+
+export const EditCell = ({ rowData, dataKey, onChange, ...props }) => {
+  const editing = rowData.editing
+  return (
+    <Cell {...props} className={editing ? 'table-content-editing' : ''}>
+      {editing ? (
+        <input
+          className="rs-input"
+          defaultValue={rowData[dataKey]}
+          onChange={event => {
+            onChange && onChange(rowData.id, dataKey, event.target.value)
+          }}
+        />
+      ) : (
+        <span className="table-content-edit-span">{rowData[dataKey]}</span>
+      )}
+    </Cell>
+  )
+}
+
+const EditActionCell = ({ rowData, dataKey, onClick, ...props }) => {
+  return (
+    <Cell {...props} style={{ padding: '6px 0' }}>
+      <Button
+        appearance="link"
+        onClick={() => {
+          onClick && onClick(rowData.id)
+        }}
+      >
+        {rowData.editing ? 'Save' : 'Edit'}
+      </Button>
+    </Cell>
+  )
+}
+
+const StartActionCell = ({ rowData, dataKey, onClick, ...props }) => {
+  return (
+    <Cell {...props}>
+      <Button appearance="link" onClick={() => {
+        onClick && onClick(rowData.id)
+      }}>
+        {'CLICK ME'}
+      </Button>
+    </Cell>
+  )
+}
 
 export async function getServerSideProps() {
   let serverData = {}
@@ -110,6 +155,11 @@ export default React.memo(function Home({serverData}) {
       </Column>
 
       <Column flexGrow={1}>
+        <HeaderCell>TASK</HeaderCell>
+        <Cell dataKey="task"/>
+      </Column>
+
+      <Column flexGrow={1}>
         <HeaderCell>LAST_MODIFIED</HeaderCell>
         <Cell dataKey="last_modified"/>
       </Column>
@@ -138,16 +188,6 @@ export default React.memo(function Home({serverData}) {
         <HeaderCell>Start</HeaderCell>
         <StartActionCell dataKey="id" onClick={handleStart}/> 
       </Column>
-
-    {/*<Column flexGrow={1}>
-        <HeaderCell>Action</HeaderCell>
-        <ActionCell dataKey="id" onClick={{
-          clickFunctions: {
-            startClick: handleStart,
-            editClick: handleEditState
-          }
-        }}/>
-      </Column>*/}
 
     </Table>
   )
