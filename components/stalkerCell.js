@@ -21,48 +21,27 @@ export const EditCell = ({ rowData, dataKey, onChange, ...props }) => {
   )
 }
 
-export const EditActionCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props} style={{ padding: '6px 0' }}>
-      <Button
-        appearance="link"
-        onClick={() => {
-          onClick && onClick(rowData.id)
-        }}
-      >
-        {rowData.editing ? 'Save' : 'Edit'}
-      </Button>
-    </Cell>
-  )
-}
-
-export const StartActionCell = ({ rowData, dataKey, onClick, ...props }) => {
-  return (
-    <Cell {...props}>
-      <Button appearance="link" onClick={() => {
-        onClick && onClick(rowData.id)
-      }}>
-        {'CLICK ME'}
-      </Button>
-    </Cell>
-  )
-}
-
 export const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
   return (
     <Cell {...props} style={{ padding: '6px: 0' }}>
       <Button appearance="link" onClick={() => {
         onClick && onClick(rowData.id,'start')
-        //clickFunctions.startClick && clickFunctions.startClick(rowData.id)
       }}>
         {'CLICK ME'}
       </Button>
+
       <Button appearance="link" onClick={() => {
-        //clickFunctions.editClick && clickFunctions.editClick(rowData.id)
         onClick && onClick(rowData.id,'edit')
       }}>
         {rowData.editing ? 'Save' : 'Edit'}
       </Button>
+
+      <Button appearance="link" onClick={() => {
+        onClick && onClick(rowData.id,'add')
+      }}>
+        {'Add'}
+      </Button>
+
     </Cell>
   )
 }

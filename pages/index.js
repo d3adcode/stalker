@@ -8,7 +8,7 @@ import { differenceInSeconds } from 'date-fns'
 import Task from '../models/task'
 import Session from '../models/session'
 import fetch from 'isomorphic-fetch'
-import { ActionCell, EditCell, EditActionCell, StartActionCell } from '../components/stalkerCell'
+import { ActionCell, EditCell } from '../components/stalkerCell'
 
 export async function getServerSideProps() {
   let serverData = {}
@@ -37,7 +37,6 @@ export async function getServerSideProps() {
 }
 
 export default React.memo(function Home({serverData}) {
-  //console.log(`serverData: ${JSON.stringify(serverData,null,2)}`)
   const [data, setData] = useState(serverData)
 
   const handleChange = (id, key, value) => {
@@ -83,17 +82,18 @@ export default React.memo(function Home({serverData}) {
 
       setData(newData)
     }
-    else { // eventType === 'edit'
+    else if (eventType === 'add') {
+    }
+    else if (eventType === 'edit') {
       let nextData = Object.assign([], data)
       let activeItem = nextData.tasks.find(item => item.id === id)
-      //activeItem.editing = activeItem.editing ? null : 'EDIT'
       activeItem.editing = !activeItem.editing
       setData(nextData)
     }
   }
 
   return (
-    <Table data={data.tasks} width={1200} height={1000}
+    <Table data={data.tasks} width={1500} height={1000}
       rowClassName={row => {
         return row && row.selected ? 'active-row' : ''
       }}>
