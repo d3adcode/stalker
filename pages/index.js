@@ -46,51 +46,50 @@ export default React.memo(function Home({serverData}) {
     setData(nextData)
   }
 
-  const handleEditState = id => {
-    let nextData = Object.assign([], data)
-    let activeItem = nextData.tasks.find(item => item.id === id)
-    //activeItem.editing = activeItem.editing ? null : 'EDIT'
-    activeItem.editing = !activeItem.editing
-    setData(nextData)
-  }
+  const handleEvent = (id,eventType) => {
+    if (eventType === 'start') {
+      let newData = {...data}
+      let row = newData.tasks[id]
 
-  const handleStart = id => {
-    //const nextData = Object.assign([], data)
-    let newData = {...data}
-    let row = newData.tasks[id]
-    //let newRow = newData.tasks[id]
+      let newRow = new Task(row.id,row.task,null,!row.selected,false,0,row.total)
+      newData.tasks[id] = newRow
 
-    let newRow = new Task(row.id,row.task,null,!row.selected,false,0,row.total)
-    newData.tasks[id] = newRow
+      //(new Session(row.id,null,newRow.selected ? 'start' : 'stop')).save()
 
-    //(new Session(row.id,null,newRow.selected ? 'start' : 'stop')).save()
+      if (newRow && newRow.selected) {
+        let timerObj = {id: row.id}
 
-    if (newRow && newRow.selected) {
-      let timerObj = {id: row.id}
+        // can't be arrow function because we have to bind timerObj
+        let timer = (function() {
+          let newData = {...data}
+          let row = newData.tasks[this.id]
 
-      // can't be arrow function because we have to bind timerObj
-      let timer = (function() {
-        let newData = {...data}
-        let row = newData.tasks[this.id]
+          console.log(row)
 
-        console.log(row)
+          if (row.selected) {
+            row.current++
+            row.total++
 
-        if (row.selected) {
-          row.current++
-          row.total++
+            setData(newData)
 
-          setData(newData)
+            // use setTimeout so we automatically stop timer once the row becomes inactive
+            setTimeout(timer,1000)
+           }
+        }).bind(timerObj)
 
-          // use setTimeout so we automatically stop timer once the row becomes inactive
-          setTimeout(timer,1000)
-         }
-      }).bind(timerObj)
+        // use setTimeout so we automatically stop timer once the row becomes inactive
+        setTimeout(timer,1000)
+      }
 
-      // use setTimeout so we automatically stop timer once the row becomes inactive
-      setTimeout(timer,1000)
+      setData(newData)
     }
-
-    setData(newData)
+    else { // eventType === 'edit'
+      let nextData = Object.assign([], data)
+      let activeItem = nextData.tasks.find(item => item.id === id)
+      //activeItem.editing = activeItem.editing ? null : 'EDIT'
+      activeItem.editing = !activeItem.editing
+      setData(nextData)
+    }
   }
 
   return (
@@ -131,23 +130,8 @@ export default React.memo(function Home({serverData}) {
 
       <Column flexGrow={1}>
         <HeaderCell>Action</HeaderCell>
-        <EditActionCell dataKey="id" onClick={handleEditState} />
+        <ActionCell dataKey="id" onClick={handleEvent}/>
       </Column>
-
-      <Column flexGrow={1}>
-        <HeaderCell>Start</HeaderCell>
-        <StartActionCell dataKey="id" onClick={handleStart}/> 
-      </Column>
-
-    {/*<Column flexGrow={1}>
-        <HeaderCell>Action</HeaderCell>
-        <ActionCell dataKey="id" onClick={{
-          clickFunctions: {
-            startClick: handleStart,
-            editClick: handleEditState
-          }
-        }}/>
-      </Column>*/}
 
     </Table>
   )

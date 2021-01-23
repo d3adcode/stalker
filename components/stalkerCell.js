@@ -48,16 +48,18 @@ export const StartActionCell = ({ rowData, dataKey, onClick, ...props }) => {
   )
 }
 
-export const ActionCell = ({ rowData, dataKey, clickFunctions, ...props }) => {
+export const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
   return (
     <Cell {...props} style={{ padding: '6px: 0' }}>
       <Button appearance="link" onClick={() => {
-        clickFunctions.startClick && clickFunctions.startClick(rowData.id)
+        onClick && onClick(rowData.id,'start')
+        //clickFunctions.startClick && clickFunctions.startClick(rowData.id)
       }}>
         {'CLICK ME'}
       </Button>
       <Button appearance="link" onClick={() => {
-        clickFunctions.editClick && clickFunctions.editClick(rowData.id)
+        //clickFunctions.editClick && clickFunctions.editClick(rowData.id)
+        onClick && onClick(rowData.id,'edit')
       }}>
         {rowData.editing ? 'Save' : 'Edit'}
       </Button>
