@@ -1,5 +1,4 @@
-//import Task from '../../models/task'
-import DBService from './dbService'
+import DBService from '../services/dbService'
 
 DBService.init()
 

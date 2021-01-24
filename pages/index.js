@@ -8,12 +8,13 @@ import { differenceInSeconds } from 'date-fns'
 import Task from '../models/task'
 import Session from '../models/session'
 import fetch from 'isomorphic-fetch'
-import { ActionCell, EditCell } from '../components/stalkerCell'
+import { ActionCell, EditCell } from '../views/stalkerCell'
+import { StalkerTable } from '../views/stalkerTable'
 
 export async function getServerSideProps() {
   let serverData = {}
 
-  await fetch('http://localhost:3000/api/session-controller',{
+  await fetch('http://localhost:3000/api/controllers/session-controller',{
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   })
@@ -23,7 +24,7 @@ export async function getServerSideProps() {
   })
   .catch(error => {console.log(`caught: ${error}`)})
 
-  await fetch('http://localhost:3000/api/task-controller',{
+  await fetch('http://localhost:3000/api/controllers/task-controller',{
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   })
@@ -63,8 +64,6 @@ export default React.memo(function Home({serverData}) {
           let newData = {...data}
           let row = newData.tasks[this.id]
 
-          console.log(row)
-
           if (row.selected) {
             row.current++
             row.total++
@@ -93,46 +92,6 @@ export default React.memo(function Home({serverData}) {
   }
 
   return (
-    <Table data={data.tasks} width={1500} height={1000}
-      rowClassName={row => {
-        return row && row.selected ? 'active-row' : ''
-      }}>
-
-      <Column flexGrow={1}>
-        <HeaderCell>Task</HeaderCell>
-        <EditCell dataKey="task" onChange={handleChange} />
-      </Column>
-
-      <Column flexGrow={1}>
-        <HeaderCell>ID</HeaderCell>
-        <Cell dataKey="id"/>
-      </Column>
-
-      <Column flexGrow={1}>
-        <HeaderCell>LAST_MODIFIED</HeaderCell>
-        <Cell dataKey="last_modified"/>
-      </Column>
-
-      <Column flexGrow={1}>
-        <HeaderCell>SELECTED</HeaderCell>
-        <Cell dataKey="selected"/>
-      </Column>
-
-      <Column flexGrow={1}>
-        <HeaderCell>CURRENT</HeaderCell>
-        <Cell dataKey="current"/>
-      </Column>
-
-      <Column flexGrow={1}>
-        <HeaderCell>TOTAL</HeaderCell>
-        <Cell dataKey="total"/>
-      </Column>
-
-      <Column flexGrow={1}>
-        <HeaderCell>Action</HeaderCell>
-        <ActionCell dataKey="id" onClick={handleEvent}/>
-      </Column>
-
-    </Table>
+    <StalkerTable tasks={data.tasks} handleChange={handleChange} handleEvent={handleEvent}/>
   )
 })

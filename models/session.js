@@ -9,7 +9,7 @@ export default function Session(task_id,create_date,session_type) {
 
   this.save = () => {
     if (!this.id) {
-      fetch('/api/session-controller',{
+      fetch('/api/controllers/session-controller',{
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -25,7 +25,7 @@ export default function Session(task_id,create_date,session_type) {
       .catch(error => {console.log(`caught: ${error}`)})
     }
     else { // PUT = UPDATE
-      fetch('/api/session-controller',{
+      fetch('/api/controllers/session-controller',{
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

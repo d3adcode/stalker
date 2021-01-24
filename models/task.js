@@ -9,7 +9,7 @@ export default function Task (id,task,last_modified,selected,editing,current,tot
 
   this.save = () => {
     if (!this.id) {
-      fetch('/api/task-controller',{
+      fetch('/api/controllers/task-controller',{
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -25,7 +25,7 @@ export default function Task (id,task,last_modified,selected,editing,current,tot
       .catch(error => {console.log(`caught: ${error}`)})
     }
     else { // PUT = UPDATE
-      fetch('/api/task-controller',{
+      fetch('/api/controllers/task-controller',{
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
