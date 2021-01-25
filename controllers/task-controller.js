@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch'
+import Task from '../models/task'
 
 export const getTasks = async () => {
   let response = await fetch('http://localhost:3000/api/controllers/task-controller',{
