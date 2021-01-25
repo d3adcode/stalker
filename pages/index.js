@@ -10,31 +10,30 @@ import Session from '../models/session'
 import fetch from 'isomorphic-fetch'
 import { ActionCell, EditCell } from '../views/stalkerCell'
 import { StalkerTable } from '../views/stalkerTable'
+import { getSessions } from '../controllers/session-controller'
+import { getTasks } from '../controllers/task-controller'
 
 export async function getServerSideProps() {
-  let serverData = {}
+  let sessions = await getSessions()
+  .catch(error => {
+    console.log(`caught: ${error}`)
+    return []
+  })
 
-  await fetch('http://localhost:3000/api/controllers/session-controller',{
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
+  let tasks = await getTasks()
+  .catch(error => {
+    console.log(`caught: ${error}`)
+    return []
   })
-  .then(response => response.json())
-  .then(data => {
-    serverData.sessions = data
-  })
-  .catch(error => {console.log(`caught: ${error}`)})
 
-  await fetch('http://localhost:3000/api/controllers/task-controller',{
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
-  })
-  .then(response => response.json())
-  .then(data => {
-    serverData.tasks = data
-  })
-  .catch(error => {console.log(`caught: ${error}`)})
-
-  return { props: { serverData } }
+  return {
+    props: {
+      serverData: { 
+        tasks: tasks,
+        sessions: sessions 
+      }
+    } 
+  }
 }
 
 export default React.memo(function Home({serverData}) {
