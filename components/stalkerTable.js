@@ -5,7 +5,7 @@ import { Task } from '../models/task'
 export const StalkerTable = ({ tasks, handleChange, handleEvent, handleStart, ...props }) => {
 
   return (
-    <Table data={tasks} width={1500} height={1000}
+    <Table data={tasks} width={1800} height={1000}
       rowClassName={row => {
         return row && row.selected ? 'active-row' : ''
       }}>

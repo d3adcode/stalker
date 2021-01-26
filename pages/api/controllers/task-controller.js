@@ -5,6 +5,20 @@ DBService.init()
 export default (req, res) => {
   let db = DBService.getDB()
 
+  if (req.method === 'DELETE') {
+    let bodyTask = req.body.task
+    let index = req.body.index
+
+    let tasks = db.get('tasks').value()
+    tasks.splice(index,1)
+
+    db.get('tasks').set(tasks)
+    db.save()
+
+    //res.send(db.get('tasks').get(index).value())
+    res.json(req.body.task)
+  }
+
   if (req.method === 'GET') {
     if (req.body.id) { // single instance
       let session = db.get('tasks').value()[req.body.id]
@@ -28,7 +42,7 @@ export default (req, res) => {
     db.get('tasks').set(tasks)
     db.save()
 
-    res.send(db.get('tasks').get(index).value())
+    res.json(db.get('tasks').get(index).value())
   }
 
   if(req.method === 'PUT') {

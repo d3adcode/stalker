@@ -51,6 +51,20 @@ export default React.memo(function Home({serverData}) {
     setData(nextData)
   }
 
+  const handleDelete = async (id) => {
+    let nextData = {...data}
+    let index = nextData.tasks.findIndex(task => task.id === id)
+    let task = nextData.tasks[index]
+
+    // remove from db
+    await (new Task().fromJSON(task)).remove(index)
+    .catch(error => console.log(`caught ${error}`))
+
+    // remove from client data
+    nextData.tasks.splice(index,1)
+    setData(nextData)
+  }
+
   const handleEdit = async (id) => {
     let nextData = {...data}
     let task = nextData.tasks.find(task => task.id === id)
@@ -62,7 +76,7 @@ export default React.memo(function Home({serverData}) {
     setData(nextData)
   }
 
-  const handleStart = id => {
+  const handleStart = async (id) => {
     let nextData = {...data}
     let index = nextData.tasks.findIndex(task => task.id === id)
     let task = nextData.tasks[index]
@@ -70,13 +84,14 @@ export default React.memo(function Home({serverData}) {
 
     let newTask = nextData.tasks[index]
 
+    await newTask.save().catch(error => console.log(`caught ${error}`))
+
     if (newTask && newTask.selected) {
       let timerObj = {id: newTask.id}
 
       // can't be arrow function because we have to bind timerObj
       let timer = (function() {
         let nextData = {...data}
-        //let row = nextData.tasks[this.id]
         let row = nextData.tasks.find(task => task.id === this.id)
 
         if (row.selected) {
@@ -107,6 +122,9 @@ export default React.memo(function Home({serverData}) {
         break
       case 'add':
         handleAdd(id)
+        break
+      case 'remove':
+        handleDelete(id)
         break
       default:
         console.log('Unsupported handle event. How did we even get here???')

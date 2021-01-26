@@ -27,7 +27,7 @@ export const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
       <Button appearance="link" onClick={() => {
         onClick && onClick(rowData.id,'start')
       }}>
-        {'Start'}
+        {rowData.selected ? 'Stop' : 'Start'}
       </Button>
 
       <Button appearance="link" onClick={() => {
@@ -41,6 +41,13 @@ export const ActionCell = ({ rowData, dataKey, onClick, ...props }) => {
       }}>
         {'Add'}
       </Button>
+
+      <Button appearance="link" onClick={() => {
+        onClick && onClick(rowData.id,'remove')
+      }}>
+        {'Remove'}
+      </Button>
+
 
     </Cell>
   )

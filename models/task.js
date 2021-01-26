@@ -9,6 +9,35 @@ function Task (id,task,last_modified,selected,editing,current,total) {
   this.current = current
   this.total = total
 
+  this.fromJSON = JSON => {
+    this.id = JSON.id,
+    this.task = JSON.task
+    this.last_modified = JSON.last_modified || (new Date()).toISOString()
+    this.selected = JSON.selected
+    this.editing = JSON.editing
+    this.current = JSON.current
+    this.total = JSON.total
+
+    return this
+  }
+
+  this.remove = async (index) => {
+    fetch('/api/controllers/task-controller',{
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        index: index,
+        task: this
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Task removed')
+      console.log(data)
+    })
+    .catch(error => {console.log(`caught: ${error}`)})
+  }
+
   this.save = async (index) => {
     if (typeof index !== 'undefined' && index >= 0) { // new instance
       fetch('/api/controllers/task-controller',{
@@ -45,17 +74,6 @@ function Task (id,task,last_modified,selected,editing,current,total) {
     }
   }
 
-  this.fromJSON = JSON => {
-    this.id = JSON.id,
-    this.task = JSON.task
-    this.last_modified = JSON.last_modified || (new Date()).toISOString()
-    this.selected = JSON.selected
-    this.editing = JSON.editing
-    this.current = JSON.current
-    this.total = JSON.total
-
-    return this
-  }
 }
 
 const getTasks = async () => {
