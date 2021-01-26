@@ -1,17 +1,11 @@
 import Head from 'next/head'
-import styles from '../styles/Home.module.css'
-import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
-import { Button } from 'rsuite'
-import 'rsuite-table/dist/css/rsuite-table.css'
 import React, { useState } from 'react'
 import { differenceInSeconds } from 'date-fns'
-import Task from '../models/task'
-import Session from '../models/session'
-import fetch from 'isomorphic-fetch'
-import { ActionCell, EditCell } from '../views/stalkerCell'
-import { StalkerTable } from '../views/stalkerTable'
-import { getSessions } from '../controllers/session-controller'
-import { getTasks } from '../controllers/task-controller'
+import { Task, getTasks } from '../models/task'
+import { Session, getSessions } from '../models/session'
+import { ActionCell, EditCell } from '../components/stalkerCell'
+import { StalkerTable } from '../components/stalkerTable'
+import { v4 as uuidv4 } from 'uuid';
 
 export async function getServerSideProps() {
   let sessions = await getSessions()
@@ -45,48 +39,71 @@ export default React.memo(function Home({serverData}) {
     setData(nextData)
   }
 
+  const handleStart = id => {
+    let newData = {...data}
+    let row = newData.tasks[id]
+
+    let newRow = new Task(row.id,row.task,null,!row.selected,false,0,row.total)
+    newData.tasks[id] = newRow
+
+    //(new Session(row.id,null,newRow.selected ? 'start' : 'stop')).save()
+
+    if (newRow && newRow.selected) {
+      let timerObj = {id: row.id}
+
+      // can't be arrow function because we have to bind timerObj
+      let timer = (function() {
+        let newData = {...data}
+        let row = newData.tasks[this.id]
+
+        if (row.selected) {
+          row.current++
+          row.total++
+
+          setData(newData)
+
+          // use setTimeout so we automatically stop timer once the row becomes inactive
+          setTimeout(timer,1000)
+         }
+      }).bind(timerObj)
+
+      // use setTimeout so we automatically stop timer once the row becomes inactive
+      setTimeout(timer,1000)
+    }
+
+    setData(newData)
+  }
+
+  const handleEdit = (id) => {
+    let nextData = {...data}
+    let activeItem = nextData.tasks.find(item => item.id === id)
+    activeItem.editing = !activeItem.editing
+    setData(nextData)
+  }
+
+  const handleAdd = (id) => {
+    let nextData = {...data}
+    let selectedRowIndex = nextData.tasks.findIndex(task => task.id === id)
+    nextData.tasks.splice(
+      selectedRowIndex+1,0,
+      new Task(uuidv4(),'',null,false,true,0,0)
+    )
+    setData(nextData)
+  }
+
   const handleEvent = (id,eventType) => {
-    if (eventType === 'start') {
-      let newData = {...data}
-      let row = newData.tasks[id]
-
-      let newRow = new Task(row.id,row.task,null,!row.selected,false,0,row.total)
-      newData.tasks[id] = newRow
-
-      //(new Session(row.id,null,newRow.selected ? 'start' : 'stop')).save()
-
-      if (newRow && newRow.selected) {
-        let timerObj = {id: row.id}
-
-        // can't be arrow function because we have to bind timerObj
-        let timer = (function() {
-          let newData = {...data}
-          let row = newData.tasks[this.id]
-
-          if (row.selected) {
-            row.current++
-            row.total++
-
-            setData(newData)
-
-            // use setTimeout so we automatically stop timer once the row becomes inactive
-            setTimeout(timer,1000)
-           }
-        }).bind(timerObj)
-
-        // use setTimeout so we automatically stop timer once the row becomes inactive
-        setTimeout(timer,1000)
-      }
-
-      setData(newData)
-    }
-    else if (eventType === 'add') {
-    }
-    else if (eventType === 'edit') {
-      let nextData = Object.assign([], data)
-      let activeItem = nextData.tasks.find(item => item.id === id)
-      activeItem.editing = !activeItem.editing
-      setData(nextData)
+    switch(eventType) {
+      case 'start':
+        handleStart(id)
+        break
+      case 'edit':
+        handleEdit(id)
+        break
+      case 'add':
+        handleAdd(id)
+        break
+      default:
+        console.log('Unsupported handle event. How did we even get here???')
     }
   }
 

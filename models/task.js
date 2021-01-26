@@ -1,4 +1,6 @@
-export default function Task (id,task,last_modified,selected,editing,current,total) {
+import fetch from 'isomorphic-fetch'
+
+function Task (id,task,last_modified,selected,editing,current,total) {
   this.id = id
   this.task = task
   this.last_modified = last_modified || (new Date()).toISOString()
@@ -41,4 +43,28 @@ export default function Task (id,task,last_modified,selected,editing,current,tot
       .catch(error => {console.log(`caught: ${error}`)})
     }
   }
+}
+
+const getTasks = async () => {
+  let response = await fetch('http://localhost:3000/api/controllers/task-controller',{
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .catch(error => {
+    console.log(`caught: ${error}`)
+    return []
+  })
+
+  let result = await response.json()
+  .catch(error => {
+    console.log(`caught: ${error}`)
+    return []
+  })
+
+  return result
+}
+
+export {
+  Task,
+  getTasks
 }

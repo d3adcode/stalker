@@ -1,7 +1,9 @@
 import { Table, Column, HeaderCell, Cell } from 'rsuite-table'
-import { ActionCell, EditCell } from '../views/stalkerCell'
+import { ActionCell, EditCell } from '../components/stalkerCell'
+import { Task } from '../models/task'
 
-export const StalkerTable = ({ tasks, handleChange, handleEvent, ...props }) => {
+export const StalkerTable = ({ tasks, handleChange, handleEvent, handleStart, ...props }) => {
+
   return (
     <Table data={tasks} width={1500} height={1000}
       rowClassName={row => {
