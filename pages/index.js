@@ -33,28 +33,51 @@ export async function getServerSideProps() {
 export default React.memo(function Home({serverData}) {
   const [data, setData] = useState(serverData)
 
+  const handleAdd = async (id) => {
+    let nextData = {...data}
+    let index = nextData.tasks.findIndex(task => task.id === id)
+    let task = new Task(uuidv4(),'',null,false,true,0,0)
+
+    await task.save(index+1).catch(error => {console.log(`caught: ${error}`)})
+
+    nextData.tasks.splice(index+1,0,task)
+
+    setData(nextData)
+  }
+
   const handleChange = (id, key, value) => {
     let nextData = Object.assign([], data)
     nextData.tasks.find(item => item.id === id)[key] = value
     setData(nextData)
   }
 
+  const handleEdit = async (id) => {
+    let nextData = {...data}
+    let task = nextData.tasks.find(task => task.id === id)
+
+    task.editing = !task.editing // toggle editing/save
+    if (!task.editing) { // done editing, now save
+      await new Task().fromJSON(task).save()
+    }
+    setData(nextData)
+  }
+
   const handleStart = id => {
     let nextData = {...data}
-    let row = nextData.tasks[id]
+    let index = nextData.tasks.findIndex(task => task.id === id)
+    let task = nextData.tasks[index]
+    nextData.tasks[index] = new Task(task.id,task.task,null,!task.selected,false,0,task.total)
 
-    let newRow = new Task(row.id,row.task,null,!row.selected,false,0,row.total)
-    nextData.tasks[id] = newRow
+    let newTask = nextData.tasks[index]
 
-    //(new Session(row.id,null,newRow.selected ? 'start' : 'stop')).save()
-
-    if (newRow && newRow.selected) {
-      let timerObj = {id: row.id}
+    if (newTask && newTask.selected) {
+      let timerObj = {id: newTask.id}
 
       // can't be arrow function because we have to bind timerObj
       let timer = (function() {
         let nextData = {...data}
-        let row = nextData.tasks[this.id]
+        //let row = nextData.tasks[this.id]
+        let row = nextData.tasks.find(task => task.id === this.id)
 
         if (row.selected) {
           row.current++
@@ -70,29 +93,6 @@ export default React.memo(function Home({serverData}) {
       // use setTimeout so we automatically stop timer once the row becomes inactive
       setTimeout(timer,1000)
     }
-
-    setData(nextData)
-  }
-
-  const handleEdit = async (id) => {
-    let nextData = {...data}
-    let task = nextData.tasks.find(task => task.id === id)
-
-    task.editing = !task.editing // toggle editing/save
-    if (!task.editing) { // done editing, now save
-      await new Task().fromJSON(task).save()
-    }
-    setData(nextData)
-  }
-
-  const handleAdd = async (id) => {
-    let nextData = {...data}
-    let index = nextData.tasks.findIndex(task => task.id === id)
-    let task = new Task(uuidv4(),'',null,false,true,0,0)
-
-    await task.save(index+1).catch(error => {console.log(`caught: ${error}`)})
-
-    nextData.tasks.splice(index+1,0,task)
 
     setData(nextData)
   }
