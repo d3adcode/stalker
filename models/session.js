@@ -42,6 +42,15 @@ function Session(task_id,create_date,session_type) {
     }
   }
 
+  this.fromJSON = JSON => {
+    this.id = JSON.id
+    this.task_id = JSON.task_id
+    this.create_date = JSON.create_date || (new Date()).toISOString()
+    this.session_type = JSON.session_type
+
+    return this
+  }
+
 }
 
 const getSessions = async () => {

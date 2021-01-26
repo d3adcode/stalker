@@ -40,11 +40,11 @@ export default React.memo(function Home({serverData}) {
   }
 
   const handleStart = id => {
-    let newData = {...data}
-    let row = newData.tasks[id]
+    let nextData = {...data}
+    let row = nextData.tasks[id]
 
     let newRow = new Task(row.id,row.task,null,!row.selected,false,0,row.total)
-    newData.tasks[id] = newRow
+    nextData.tasks[id] = newRow
 
     //(new Session(row.id,null,newRow.selected ? 'start' : 'stop')).save()
 
@@ -53,14 +53,14 @@ export default React.memo(function Home({serverData}) {
 
       // can't be arrow function because we have to bind timerObj
       let timer = (function() {
-        let newData = {...data}
-        let row = newData.tasks[this.id]
+        let nextData = {...data}
+        let row = nextData.tasks[this.id]
 
         if (row.selected) {
           row.current++
           row.total++
 
-          setData(newData)
+          setData(nextData)
 
           // use setTimeout so we automatically stop timer once the row becomes inactive
           setTimeout(timer,1000)
@@ -71,29 +71,29 @@ export default React.memo(function Home({serverData}) {
       setTimeout(timer,1000)
     }
 
-    setData(newData)
+    setData(nextData)
   }
 
   const handleEdit = async (id) => {
     let nextData = {...data}
-    let activeItem = nextData.tasks.find(item => item.id === id)
-    activeItem.editing = !activeItem.editing
+    let task = nextData.tasks.find(task => task.id === id)
+
+    task.editing = !task.editing // toggle editing/save
+    if (!task.editing) { // done editing, now save
+      await new Task().fromJSON(task).save()
+    }
     setData(nextData)
   }
 
   const handleAdd = async (id) => {
     let nextData = {...data}
-    let selectedRowIndex = nextData.tasks.findIndex(task => task.id === id)
+    let index = nextData.tasks.findIndex(task => task.id === id)
     let task = new Task(uuidv4(),'',null,false,true,0,0)
 
-    await task.save()
-    .catch(error => {console.log(`caught: ${error}`)})
+    await task.save(index+1).catch(error => {console.log(`caught: ${error}`)})
 
-    nextData.tasks.splice(
-      selectedRowIndex+1,0,
-      //new Task(uuidv4(),'',null,false,true,0,0)
-      task
-    )
+    nextData.tasks.splice(index+1,0,task)
+
     setData(nextData)
   }
 

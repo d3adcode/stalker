@@ -9,12 +9,13 @@ function Task (id,task,last_modified,selected,editing,current,total) {
   this.current = current
   this.total = total
 
-  this.save = async () => {
-    if (!last_modified) { // new instance
+  this.save = async (index) => {
+    if (typeof index !== 'undefined' && index >= 0) { // new instance
       fetch('/api/controllers/task-controller',{
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          index: index,
           task: this
         })
       })
@@ -42,6 +43,18 @@ function Task (id,task,last_modified,selected,editing,current,total) {
       })
       .catch(error => {console.log(`caught: ${error}`)})
     }
+  }
+
+  this.fromJSON = JSON => {
+    this.id = JSON.id,
+    this.task = JSON.task
+    this.last_modified = JSON.last_modified || (new Date()).toISOString()
+    this.selected = JSON.selected
+    this.editing = JSON.editing
+    this.current = JSON.current
+    this.total = JSON.total
+
+    return this
   }
 }
 
