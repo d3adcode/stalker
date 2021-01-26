@@ -74,19 +74,25 @@ export default React.memo(function Home({serverData}) {
     setData(newData)
   }
 
-  const handleEdit = (id) => {
+  const handleEdit = async (id) => {
     let nextData = {...data}
     let activeItem = nextData.tasks.find(item => item.id === id)
     activeItem.editing = !activeItem.editing
     setData(nextData)
   }
 
-  const handleAdd = (id) => {
+  const handleAdd = async (id) => {
     let nextData = {...data}
     let selectedRowIndex = nextData.tasks.findIndex(task => task.id === id)
+    let task = new Task(uuidv4(),'',null,false,true,0,0)
+
+    await task.save()
+    .catch(error => {console.log(`caught: ${error}`)})
+
     nextData.tasks.splice(
       selectedRowIndex+1,0,
-      new Task(uuidv4(),'',null,false,true,0,0)
+      //new Task(uuidv4(),'',null,false,true,0,0)
+      task
     )
     setData(nextData)
   }

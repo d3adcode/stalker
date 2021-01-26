@@ -9,8 +9,8 @@ function Task (id,task,last_modified,selected,editing,current,total) {
   this.current = current
   this.total = total
 
-  this.save = () => {
-    if (!this.id) {
+  this.save = async () => {
+    if (!last_modified) { // new instance
       fetch('/api/controllers/task-controller',{
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

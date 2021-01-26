@@ -9,7 +9,15 @@ export default {
   init: function() {
     if (!this.initialized) {
       this.db.default({
-        tasks: [],
+        tasks: [{
+          id:'ccf00b24-6fb5-4f29-8f01-0da8efa3f5d3',
+          task:'stalker',
+          last_modified:(new Date()).toISOString(),
+          selected: false,
+          editing: false,
+          current: 0,
+          total: 0
+        }],
         sessions: []
       })
       console.log('db initialized')

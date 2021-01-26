@@ -14,8 +14,6 @@ export default (req, res) => {
     else { // all
       let sessions = db.get('sessions').value()
       res.statusCode = 200
-      //console.log('SESSION API GET REQUEST')
-      //console.log('SESSION API RETURN ' + sessions)
       res.json(sessions)
     }
   }
